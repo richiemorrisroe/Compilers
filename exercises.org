@@ -1,0 +1,70 @@
+* Construct some context free grammars.
+** Postfix Arithmatic.
+
+Lets start with a few expressions. 
+2+3*5, in infix becomes 23+5*, 
+9+4-10
+
+Expr -> 
+list | digit 
+plus | digit digit +
+minus | digit digit -
+digit | 0..9
+** Left associated lists in commas
+So, something like (2, 3, 5) or (a, b, c)
+Expr -> 
+start | (
+end | )
+list | start elem+ end
+list | (elem) 
+list | (elem, list)
+elem | 0..9,
+elem | a-z+,
+** Right associated lists in commas
+I have no idea how to approach this, probably need to re-read the section. 
+** Arithmetic expressions
+Four binary operators +-*/
+factor -> digit | (expr)
+term -> term * factor
+ | term/factor |
+ | factor      |
+expr -> expr + term
+   | expr - term |
+   | term        |
+
+list -> list + digit
+list -> list - digit
+list -> digit
+digit -> 0|1|2..|9
+** Convert integers to roman numerals
+
+Only going to cover up to fifty right now, so I only need a few symbols. I need I, V, X, L
+
+#+BEGIN_SRC python
+  roman_map = {'I':'1', 'V': 5, 'X':10, 'L':50 }
+  def int_to_roman(num):
+      global roman
+      if roman is None:
+          roman = ''
+      if num == 0:
+          return(roman)
+      if num - 50 >= 0:
+          roman = roman + 'L'
+          print(roman)
+          int_to_roman(( num - 50))
+      if num - 10 >= 0:
+          roman = roman + 'X'
+          print(roman)
+          int_to_roman(( num - 10))
+      if num - 5 >= 0:
+          roman = roman + 'V'
+          print(roman)
+          int_to_roman(( num - 5))
+      if num - 1 >= 0:
+          roman = roman + 'I'
+          print(roman)
+          int_to_roman((num - 1))
+
+
+#+END_SRC
+Haven't handled the recursion properly here. The approach seems reasonable though
