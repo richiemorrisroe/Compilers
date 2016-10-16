@@ -42,29 +42,49 @@ Only going to cover up to fifty right now, so I only need a few symbols. I need 
 
 #+BEGIN_SRC python
   roman_map = {'I':'1', 'V': 5, 'X':10, 'L':50 }
-  def int_to_roman(num):
-      global roman
-      if roman is None:
-          roman = ''
+  def int_to_roman(num, roman):
       if num == 0:
           return(roman)
       if num - 50 >= 0:
           roman = roman + 'L'
-          print(roman)
-          int_to_roman(( num - 50))
+          int_to_roman(( num - 50), roman)
       if num - 10 >= 0:
           roman = roman + 'X'
-          print(roman)
-          int_to_roman(( num - 10))
+          int_to_roman(( num - 10), roman)
       if num - 5 >= 0:
           roman = roman + 'V'
-          print(roman)
-          int_to_roman(( num - 5))
+          int_to_roman(( num - 5), roman)
       if num - 1 >= 0:
           roman = roman + 'I'
-          print(roman)
-          int_to_roman((num - 1))
-
+          int_to_roman((num - 1), roman)
+      return(roman)
 
 #+END_SRC
 Haven't handled the recursion properly here. The approach seems reasonable though
+
+#+BEGIN_SRC java :tangle output.java
+  void stmt() {
+      switch (lookahead) {
+      case expr:
+          match(expr); match(';'), break;
+      case if:
+          match(if); match('('); match(expr); match(')'); stmt();
+          break;
+      case for:
+          match(for); match('(');
+          optexpr(); match(';'); optexpr();
+          match(';'); match(')'); stmt(); break;
+      case other;
+      match(other); break;
+      default:
+          report("syntax error");
+      }
+  }
+
+  void optexpr() {
+      if(lookahead==expr) match(expr);
+  }
+  void match(terminal t) {
+      if(lookahead==t) lookahead=nextTerminal;
+      else report("syntax error")}
+#+END_SRC
