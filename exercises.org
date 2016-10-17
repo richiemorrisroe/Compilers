@@ -36,31 +36,32 @@ list -> list + digit
 list -> list - digit
 list -> digit
 digit -> 0|1|2..|9
-** Convert integers to roman numerals
+** COMMENT Convert integers to roman numerals
 
 Only going to cover up to fifty right now, so I only need a few symbols. I need I, V, X, L
 
 #+BEGIN_SRC python
-  roman_map = {'I':'1', 'V': 5, 'X':10, 'L':50 }
   def int_to_roman(num, roman):
+
       if num == 0:
           return(roman)
-      if num - 50 >= 0:
+      if num - 50 >= 1:
           roman = roman + 'L'
           int_to_roman(( num - 50), roman)
-      if num - 10 >= 0:
+      if num - 10 >= 1:
           roman = roman + 'X'
           int_to_roman(( num - 10), roman)
-      if num - 5 >= 0:
+      if num - 5 >= 1:
           roman = roman + 'V'
           int_to_roman(( num - 5), roman)
       if num - 1 >= 0:
-          roman = roman + 'I'
+          roman += 'I'
           int_to_roman((num - 1), roman)
-      return(roman)
-
+      print(num)
+      print(roman)
 #+END_SRC
 Haven't handled the recursion properly here. The approach seems reasonable though
+Update. It now works, but it's wrong. 
 
 #+BEGIN_SRC java :tangle output.java
   void stmt() {
@@ -87,4 +88,186 @@ Haven't handled the recursion properly here. The approach seems reasonable thoug
   void match(terminal t) {
       if(lookahead==t) lookahead=nextTerminal;
       else report("syntax error")}
+
+  void expr() {
+      term();
+      rest();
+  }
+
+  void rest() {
+      if (lookahead=='+') {
+          match('+');
+          term();
+          print('+');
+          rest();
+      }
+      else if (lookahead=='-') {
+          match('-');
+          term();
+          print('-');
+      }
+      else {}
+
+  }
+  void term() {
+      if (is.digit(lookahead)) {
+          t = lookahead; match(lookahead); print(t);}
+      else {
+          report("syntax error");
+      }
+  }
+#+END_SRC
+
+And now for the actual Java program. 
+
+#+BEGIN_SRC java :tangle Postfix.java :classname Postfix
+  import java.io.*;
+  class Parser {
+      static int lookahead;
+      public Parser() throws IOException {
+          lookahead = System.in.read();
+      }
+      void expr() throws IOException {
+          term();
+          while(true) {
+              if (lookahead=='+') {
+                  match('+');
+                  term();
+                  System.out.write('+');
+              }
+              else if(lookahead == '-') {
+                  match('-');
+                  term();
+                  System.out.write('-');
+              }
+              else return;
+          }
+      }
+      void term() throws IOException {
+          if (Character.isDigit((char) lookahead)) {
+              System.out.write((char)lookahead);
+              match(lookahead);
+          }
+          else throw new Error("syntax error");
+      }
+      void match(int t) throws IOException {
+          if (lookahead==t) lookahead = System.in.read();
+          else throw new Error("syntax error");
+      }
+  }
+  public class Postfix {
+      public static void main(String[] args) throws IOException {
+          Parser parse = new Parser();
+              parse.expr();
+          System.out.write('\n');
+              
+      }
+  }
+      
+#+END_SRC
+
+#+BEGIN_SRC java :tangle Tag.java :classname Tag
+   package lexer;
+  public class Tag {
+      public final static int
+          NUM = 256, ID = 257, TRUE = 258, FALSE = 259;
+  }
+#+END_SRC
+
+#+BEGIN_SRC java :tangle Num.java :classname Num
+  package lexer;
+  public class Num extends Token {
+      public final int value;
+      public Num(int v) {super(Tag.NUM); value = v;}
+      public String toString() {return "" + value;}
+  }
+#+END_SRC
+
+#+BEGIN_SRC java Word.java :classname Word
+  package lexer;
+  public class Word extends Token {
+      public final String lexeme;
+      public Word(int t, String s) {
+          super(t); lexeme = new String(s);
+      }
+  }
+#+END_SRC
+
+#+BEGIN_SRC R :tangle yes :file testdir/mytest.R
+  x <- 1:10
+
+#+END_SRC
+
+#+RESULTS:
+|  1 |
+|  2 |
+|  3 |
+|  4 |
+|  5 |
+|  6 |
+|  7 |
+|  8 |
+|  9 |
+| 10 |
+
+#+BEGIN_SRC java :tangle yes :file lexer/Lexer.java :classname Lexer
+    package lexer;
+    import java.io.*;
+    import java.util.*;
+    public class Lexer {
+        public int line = 1;
+        private char peek=' ';
+        private Hashtable words = new Hashtable();
+        void reserve (Word t) {
+            words.put(t.lexeme, t);
+        }
+        public Lexer() {
+            reserve(new Word(Tag.TRUE, "true"));
+            reserve(new Word(Tag.FALSE, "false"));
+        }
+        public Token scan() throws IOException {
+            for (; ; peek = (char)(System.in.read())) {
+                    if (peek == ' ' || peek == '\t') continue;
+                    else if(peek == '\n') line = line + 1;
+                    else break;
+
+                        
+        }
+        if (Character.isDigit (peek)) {
+            int v = 0;
+            do {
+                v = 10*v + Character.digit(peek, 10);
+                peek = (char)System.in.read();
+            } while (Character.isDigit(peek)); {
+                return new Num(v);
+            }
+        }
+        if (Character.isLetter(peek)) {
+            StringBuffer b = new Stringbuffer();
+            do {
+                b.append(peek);
+                peek = (char)System.in.read();
+            }
+            while(Character.isLetterOrDigit(peek));
+            String s = b.toString();
+            Word w = (Word)words.get(s);
+            if(w != null) return w;
+            w = new Word(Tag.ID, s);
+            words.put(s, w);
+        }
+
+        Token t = new Token(peek);
+        peek = ' ';
+        return t;
+    }
+  }
+#+END_SRC
+
+#+BEGIN_SRC java :tangle Token.java :classname Token
+  package lexer;
+  public class Token {
+      public final int tag;
+      public Token(int t) { tag = t;}
+      public String toString() {return "" + (char)tag;}
+  }
 #+END_SRC
