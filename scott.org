@@ -118,3 +118,78 @@ The language has the following symbols
 Hmmm, parser descriptions don't work well with org-tables.Sadface
 
 
+*** Code
+#+BEGIN_SRC python
+  import string as s
+  is_number = make_comparator(s.digits)
+  is_letter= make_comparator(s.ascii_letters)
+  ops = ['+', '-', '*', '/']
+  brackets = ['(', ')']
+  is_operator=make_comparator(ops)
+  is_bracket=make_comparator(brackets)
+  is_whitespace = make_comparator(s.whitespace)
+  assigns = [':', '=']
+  is_equal = make_comparator(assigns[1])
+  is_colon = make_comparator(':')
+  is_dot = make_comparator('.')
+  def read_file(file):
+      i = 0
+      with open(file) as fileobj:
+          for l, line in enumerate(fileobj):
+              for c,ch in enumerate(line):
+                  i += 1
+                  print( "line is {l}, character is {c} and value is {v}".format (l=l, c=c, v=ch))
+                  # print("iteration is at {i}".format (i=i))
+
+#+END_SRC
+
+So, I kinda deserve what happened there. I stole some code from StackOverflow, and it used the term word for the first iteration.
+This was super confusing, as the file object parses by line (presumably "\n", though one could change that). The code fragment above shows the line, character and the value (there are many newlines/whitespace). 
+
+#+BEGIN_SRC python :session
+  def check_char(char):
+      if is_whitespace(ch):
+          next
+      if is_bracket(ch):
+          print(ch)
+      if is_assign(ch):
+          pass
+      if is_dot(ch):
+          #need to handle the peeking here
+          pass
+      if is_digit(ch):
+          buff = []
+          # while(is_digit(ch)):
+          #     buff.append(ch)
+          #     num = int(''.join(buff))
+          pass
+      else:
+          print ch
+#+END_SRC
+
+See, it feels like I should be able to just deal with the whole string one char at a time, but some of the grammar requires us to parse the next few characters (i.e. assign, comments, equality (which I don't think the spec requires)). So the simple approach won't work, we'll need access to the higher level "word" (i.e. numbers greater than 10, all string identifiers, assignment and comment). 
+
+I could probably handle alnums separately as they are likely to be the longest strings needed to be processed as a unit. 
+Then the comments are likely to be annoying. 
+
+#+BEGIN_SRC c
+  //this is a comment, to be annoying
+  int main() {
+      int i = getint(), j = getint();
+      while (i != j) {
+        if (i > j) i = i - j;
+        else j = j - i;
+      }
+      putint(i);
+    }
+#+END_SRC
+
+Does my current program parse this correctly?
+#+BEGIN_SRC python :session
+  read_file("gcd.c")
+#+END_SRC
+
+#+RESULTS:
+:       if (i > j) i = i - j;
+
+It totally does (because I'm not doing individual character matching or trying to remove the comments). So all good until i decide to actually do stuff with it then. 
