@@ -40,7 +40,24 @@ public class Lexer {
             w = new Word(Tag.ID, s);
             words.put(s, w);
         }
-
+        if (peek=="//".toChar()) {
+            StringBuffer c = new StringBuffer();
+            while(peek!="\n") {
+                c.append(peek);
+                peek = (char)System.in.read();
+            }
+        }
+        if(peek=="//".toChar()) {
+            Stringbuffer c2 = new StringBuffer();
+            peek = (char)System.in.read();
+            if(peek=="//".to.Char()) {
+                do {
+                    c2.append(peek);
+                    peek = (char)System.in.read();
+                }
+                while(peek!='\n');
+            }
+        }
         Token t = new Token(peek);
         peek = ' ';
         return t;
