@@ -63,3 +63,58 @@ Weirdly enough, I can't get Python to write to the org buffer. That's unfortunat
 
 I'll keep improving it as I go along. 
 
+#+BEGIN_SRC python :session
+  x = "teststr123"
+  z = "filter(func, list)"
+  #letters only
+  filter(lambda x: x in s.ascii_letters, x)
+  ##or using list comprehensions
+  y = [x for x in x if x in s.ascii_letters]
+  ##numbers only
+  filter(lambda x: x in s.digits, x)
+  ## punctuation only
+  filter(lambda x: x in s.punctuation, z)
+  def is_number(char):
+      if char in s.digits:
+          return char
+      else:
+          pass
+
+  map(is_number, nums)
+  strings = 'richie'
+  map(is_number, strings)
+  def make_comparator(list):
+      def comp(char):
+          if char in list:
+              return char
+          else:
+              pass
+      return(comp)
+  is_letter=make_comparator(s.ascii_letters)
+#+END_SRC
+
+So that's nice. I messed around with parsing, found the string module (which is awesome), and then used its constants to save me some problems. Additionally, I wrote a function that can be used to make comparators which I can use for lexing as I move along this book. 
+
+** Chapter 2
+
+Yay, he gives psuedocode for a scanner for a calculator.
+That seems like it's worth implementing. 
+
+*** Grammar
+The language has the following symbols
+
+| Meaning | Symbol           |        |
+|---------+------------------+--------|
+| assign  | `:=`             |        |
+| plus    | +                |        |
+| minus   | -                |        |
+| times   | *                |        |
+| div     | /                |        |
+| lparen  | (                |        |
+| rparen  | )                |        |
+| id      | letter (letter \ | digit) |
+| number  | digit digit * |digit*(. digit|digit) digit* |        |
+
+Hmmm, parser descriptions don't work well with org-tables.Sadface
+
+
