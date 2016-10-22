@@ -1,0 +1,65 @@
+* Programming Language Pragmatics
+- M Scott
+
+** Chapter 1
+
+- Difference in GCD algorithm between different types of languages
+
+#+BEGIN_SRC c
+  int gcd(int a, int b) {
+    while(a!=b) {
+      if (a > b) a = a -b;
+      else b = b - a;
+    }
+  }
+#+END_SRC
+
+And in Scheme
+
+#+BEGIN_SRC scheme
+  (define gcd
+    (lambda (a b)
+      (cond ((= a b) a)
+            ((> a b) (gcd (- a b)b))
+            (else (gcd (- b a) a)))))
+#+END_SRC
+
+And finally in Prolog (which I have never seen before)
+
+#+BEGIN_SRC prolog
+  gcd(A, B, G) :- A = B, G = A.
+  gcd(A, B, G) :- A > B, C is A-B, gcd(C, B, G).
+  gcd(A, B, G) :- B > A, C is B-A, gcd(C, A, G).
+#+END_SRC
+
+In prolog, ~if~ maps to ~:-~ and ~and~ maps to ~,~
+
+#+BEGIN_SRC c :name gcd.c
+  int main() {
+    int i = getint(), j = getint();
+    while (i != j) {
+      if (i > j) i = i - j;
+      else j = j - i;
+    }
+    putint(i);
+  }
+#+END_SRC
+
+#+BEGIN_SRC python :session :tangle reader.py :results none
+  def read_file(file):
+      with open(file) as fileobj:
+          for word in fileobj:
+              for ch in word:
+                  print ch
+#+END_SRC
+
+#+BEGIN_SRC python :session :results value
+read_file("gcd.c")
+#+END_SRC
+
+#+RESULTS:
+
+Weirdly enough, I can't get Python to write to the org buffer. That's unfortunate. However, when I use the code above, I end up with far too many newlines. I'd actually need to deal with each character as I go to actually lex the file. 
+
+I'll keep improving it as I go along. 
+
