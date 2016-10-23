@@ -123,9 +123,11 @@ Hmmm, parser descriptions don't work well with org-tables.Sadface
   import string as s
   is_number = make_comparator(s.digits)
   is_letter= make_comparator(s.ascii_letters)
-  ops = ['+', '-', '*', '/']
+  mult_ops = ['*', '/']
+  add_ops = ['+', '-' ]
   brackets = ['(', ')']
-  is_operator=make_comparator(ops)
+  is_add_op=make_comparator(add_ops)
+  is_mult_op=make_comparator(mult_ops)
   is_bracket=make_comparator(brackets)
   is_whitespace = make_comparator(s.whitespace)
   assigns = [':', '=']
@@ -147,16 +149,41 @@ So, I kinda deserve what happened there. I stole some code from StackOverflow, a
 This was super confusing, as the file object parses by line (presumably "\n", though one could change that). The code fragment above shows the line, character and the value (there are many newlines/whitespace). 
 
 #+BEGIN_SRC python :session
-  def check_char(char):
+  import string as s
+  is_number = make_comparator(s.digits)
+  is_letter= make_comparator(s.ascii_letters)
+  mult_ops = ['*', '/']
+  add_ops = ['+', '-' ]
+  brackets = ['(', ')']
+  is_add_op=make_comparator(add_ops)
+  is_mult_op=make_comparator(mult_ops)
+  is_bracket=make_comparator(brackets)
+  is_whitespace = make_comparator(s.whitespace)
+  assigns = [':', '=']
+  is_equal = make_comparator(assigns[1])
+  is_colon = make_comparator(':')
+  is_dot = make_comparator('.')
+#+END_SRC
+
+Above I create a bunch of comparison functions to make the string matching in the core scanner easier. It also allowed me to start using higher-order functions in Python (Pro-tip: its really easy). 
+
+#+BEGIN_SRC python :session
+  def check_char(char, lookahead):
       if is_whitespace(ch):
           next
       if is_bracket(ch):
           print(ch)
-      if is_assign(ch):
-          pass
+      if is_colon(ch):
+          if is_equal(lookahead):
+              #figure out how to handle assignment statements
+              pass
       if is_dot(ch):
           #need to handle the peeking here
-          pass
+          if is_digit(lookahead):
+              # buff = []
+              # while(is_digit(lookahead)):
+              #     lookahead = word[ch+1]
+              pass
       if is_digit(ch):
           buff = []
           # while(is_digit(ch)):
@@ -168,6 +195,8 @@ This was super confusing, as the file object parses by line (presumably "\n", th
 #+END_SRC
 
 See, it feels like I should be able to just deal with the whole string one char at a time, but some of the grammar requires us to parse the next few characters (i.e. assign, comments, equality (which I don't think the spec requires)). So the simple approach won't work, we'll need access to the higher level "word" (i.e. numbers greater than 10, all string identifiers, assignment and comment). 
+
+So I can use lookahead for the scanner, and indeed I probably need to. I could also implement it as while not whitespace, collect characters. I'll need to handle erroring out though, which may be tricky
 
 I could probably handle alnums separately as they are likely to be the longest strings needed to be processed as a unit. 
 Then the comments are likely to be annoying. 
