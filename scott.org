@@ -45,13 +45,15 @@ In prolog, ~if~ maps to ~:-~ and ~and~ maps to ~,~
   }
 #+END_SRC
 
-#+BEGIN_SRC python :session :tangle reader.py :results none
+#+BEGIN_SRC python :session :tangle reader.py :results pp
   def read_file(file):
       with open(file) as fileobj:
           for word in fileobj:
               for ch in word:
                   print ch
 #+END_SRC
+
+#+RESULTS:
 
 #+BEGIN_SRC python :session :results value
 read_file("gcd.c")
@@ -160,7 +162,7 @@ This was super confusing, as the file object parses by line (presumably "\n", th
   is_bracket=make_comparator(brackets)
   is_whitespace = make_comparator(s.whitespace)
   assigns = [':', '=']
-  is_equal = make_comparator(assigns[1])
+  is_equal = make_comparator("=")
   is_colon = make_comparator(':')
   is_dot = make_comparator('.')
 #+END_SRC
@@ -198,6 +200,13 @@ See, it feels like I should be able to just deal with the whole string one char 
 
 So I can use lookahead for the scanner, and indeed I probably need to. I could also implement it as while not whitespace, collect characters. I'll need to handle erroring out though, which may be tricky
 
+**** Approaches to lookahead
+- ignore characters, parse the "words" defined by python and file read (spaces, tabs, newlines)
+
+#+BEGIN_SRC python :session
+
+#+END_SRC
+
 I could probably handle alnums separately as they are likely to be the longest strings needed to be processed as a unit. 
 Then the comments are likely to be annoying. 
 
@@ -222,3 +231,102 @@ Does my current program parse this correctly?
 :       if (i > j) i = i - j;
 
 It totally does (because I'm not doing individual character matching or trying to remove the comments). So all good until i decide to actually do stuff with it then. 
+
+
+#+BEGIN_SRC python :session
+with open("gcd.c") as gcd:
+    for line in gcd:
+        for word in line:
+            if not is_whitespace(word):
+                print(word)
+#+END_SRC
+
+*** Exercises
+Write a regex to match a string in C
+#+BEGIN_SRC sh
+egrep "\"[a-z ]+\"" test.txt 
+#+END_SRC
+
+Comments in Pascal parentheses
+
+#+BEGIN_SRC sh
+egrep "^(\*.*\*)" test.txt
+#+END_SRC
+
+Actually, accounting for Emacs, they actually look like this. 
+This is because Emacs matches parentheses as parentheses rather than as grouping operators. 
+#+BEGIN_SRC sh
+egrep "^\(\*.*\*\)" test.txt
+#+END_SRC
+
+Comments in Pascal both
+
+#+BEGIN_SRC sh
+egrep "^[({].*[)}]" test.txt
+#+END_SRC
+
+Numeric constants in C
+- Octal begins with 0 with digits 0-7
+- hexadecimal begins with 0x or 0X and has 0-9, A-F as elements
+
+Match octal numbers
+#+BEGIN_SRC sh
+egrep "^[0]+[0-7]+" nums.txt
+#+END_SRC
+
+Match hexadecimal numbers
+
+#+BEGIN_SRC sh
+egrep "^0[xX][0-9]+" nums.txt
+#+END_SRC
+
+** Chapter 3
+
+*** Closures
+
+In Scheme. 
+
+#+BEGIN_SRC scheme
+  (define plus-x (lambda (x)
+                   (lambda (y) (+ x y))))
+#+END_SRC
+
+Java uses objects to achieve a similar effect.
+
+#+BEGIN_SRC java
+  interface IntFunc {
+      public int call(int t);
+  }
+  class PlusX implements IntFunc {
+      final int x;
+      PlusX(int n) { x = n;}
+      public int call(int i) {return i + x;}
+  }
+  IntFunc f = new PlusX(2);
+  System.out.println(f.call(3));
+#+END_SRC
+
+Java takes a little more code :)
+
+C++ is a little better. 
+
+#+BEGIN_SRC C++
+  class int_func {
+  public:
+    virtual int operator() (int i) = 0;
+
+  };
+  class plus_x : public int_func {
+    const int x;
+  public:
+    plus_x(int n) : x(n) {}
+    virtual int operator()(int i) { return i + x;}
+  };
+  plus_x f(2);
+  cout << f(3) << "\n";
+#+END_SRC
+
+
+**** Exercises
+
+These are really good, you should do them.
