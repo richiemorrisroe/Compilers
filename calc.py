@@ -25,8 +25,31 @@ is_bracket=make_comparator(brackets)
 # print("You entered {v}".format(v=var))
 ##start with simple calculator language
 ##implement plus, minus and parentheses
+def plus(x, y):
+    x + y
+def minus(x, y):
+    x - y
+def multiply(x, y):
+    x*y
+def divide(x, y):
+    x/y
 while(True):
     expr = raw_input("What mathematical operation would you like me to perform?")
-    res = eval(expr)
+    nums = []
+    ops = []
+    
+    for each in expr:
+        if is_number(each):
+            nums.append(each)
+        if is_add_op(each):
+            ops.append(each)
+            #leave this out first
+        # if is_bracket(each):
+        for num, op in nums, ops:
+            res = 0
+            if(ops=="+"):
+                res = plus(num, y)
+                
+            eval()
     print(res)
     print("The answer is: {res}".format(res=res))
