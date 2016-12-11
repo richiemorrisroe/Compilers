@@ -1,0 +1,5 @@
+* Introduction
+
+This repository contains various notes and small programs from a number of compiler books. 
+
+It's probably not that interesting to anyone bar me (and potentially not even that)
