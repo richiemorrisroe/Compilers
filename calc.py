@@ -7,22 +7,12 @@ def make_comparator(list):
             pass
         return(comp)
 
+def is_add_op(char):
+    if char in '+-':
+        return char
+    else:
+        pass
 is_number = make_comparator(s.digits)
-# is_letter= make_comparator(s.ascii_letters)
-# mult_ops = ['*', '/']
-add_ops = ['+', '-' ]
-brackets = ['(', ')']
-is_add_op=make_comparator(add_ops)
-# is_mult_op=make_comparator(mult_ops)
-is_bracket=make_comparator(brackets)
-# is_whitespace = make_comparator(s.whitespace)
-# assigns = [':', '=']
-# is_equal = make_comparator(assigns[1])
-# is_colon = make_comparator(':')
-# is_dot = make_comparator('.')
-# print("made around {d} objects".format(d=len(dir())))
-# var = raw_input("Give a function: ")
-# print("You entered {v}".format(v=var))
 ##start with simple calculator language
 ##implement plus, minus and parentheses
 def plus(x, y):
@@ -34,22 +24,22 @@ def multiply(x, y):
 def divide(x, y):
     x/y
 while(True):
-    expr = raw_input("What mathematical operation would you like me to perform?")
+    expr = input("What mathematical operation would you like me to perform?")
     nums = []
     ops = []
-    
+    expr.split()
+    print(expr)
     for each in expr:
+        print(type(each))
         if is_number(each):
             nums.append(each)
-        if is_add_op(each):
-            ops.append(each)
+        # if is_add_op(each):
+        #     ops.append(each)
             #leave this out first
         # if is_bracket(each):
-        for num, op in nums, ops:
-            res = 0
-            if(ops=="+"):
-                res = plus(num, y)
-                
-            eval()
-    print(res)
-    print("The answer is: {res}".format(res=res))
+        # for num, op in nums, ops:
+        #     res = 0
+        #     if(ops=="+"):
+        #         res = plus(num, y)
+    print("The operators are: {ops}".format(ops=ops))
+    print("The numbers are: {nums}".format(nums=nums))
