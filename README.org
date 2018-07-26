@@ -1,1 +1,335 @@
-scott.org
+* Programming Language Pragmatics
+- M Scott
+
+** Chapter 1
+
+- Difference in GCD algorithm between different types of languages
+
+#+BEGIN_SRC c
+  int gcd(int a, int b) {
+    while(a!=b) {
+      if (a > b) a = a -b;
+      else b = b - a;
+    }
+  }
+#+END_SRC
+
+And in Scheme
+
+#+BEGIN_SRC scheme
+  (define gcd
+    (lambda (a b)
+      (cond ((= a b) a)
+            ((> a b) (gcd (- a b)b))
+            (else (gcd (- b a) a)))))
+#+END_SRC
+
+And finally in Prolog (which I have never seen before)
+
+#+BEGIN_SRC prolog
+  gcd(A, B, G) :- A = B, G = A.
+  gcd(A, B, G) :- A > B, C is A-B, gcd(C, B, G).
+  gcd(A, B, G) :- B > A, C is B-A, gcd(C, A, G).
+#+END_SRC
+
+In prolog, ~if~ maps to ~:-~ and ~and~ maps to ~,~
+
+#+BEGIN_SRC c :name gcd.c
+  int main() {
+    int i = getint(), j = getint();
+    while (i != j) {
+      if (i > j) i = i - j;
+      else j = j - i;
+    }
+    putint(i);
+  }
+#+END_SRC
+
+#+BEGIN_SRC python :session :tangle reader.py :results pp
+  def read_file(file):
+      with open(file) as fileobj:
+          for word in fileobj:
+              for ch in word:
+                  print ch
+#+END_SRC
+
+#+RESULTS:
+
+#+BEGIN_SRC python :session :results value
+read_file("gcd.c")
+#+END_SRC
+
+#+RESULTS:
+
+Weirdly enough, I can't get Python to write to the org buffer. That's unfortunate. However, when I use the code above, I end up with far too many newlines. I'd actually need to deal with each character as I go to actually lex the file.
+
+I'll keep improving it as I go along.
+
+#+BEGIN_SRC python :session
+  x = "teststr123"
+  z = "filter(func, list)"
+  #letters only
+  filter(lambda x: x in s.ascii_letters, x)
+  ##or using list comprehensions
+  y = [x for x in x if x in s.ascii_letters]
+  ##numbers only
+  filter(lambda x: x in s.digits, x)
+  ## punctuation only
+  filter(lambda x: x in s.punctuation, z)
+  def is_number(char):
+      if char in s.digits:
+          return char
+      else:
+          pass
+
+  map(is_number, nums)
+  strings = 'richie'
+  map(is_number, strings)
+  def make_comparator(list):
+      def comp(char):
+          if char in list:
+              return char
+          else:
+              pass
+      return(comp)
+  is_letter=make_comparator(s.ascii_letters)
+#+END_SRC
+
+So that's nice. I messed around with parsing, found the string module (which is awesome), and then used its constants to save me some problems. Additionally, I wrote a function that can be used to make comparators which I can use for lexing as I move along this book.
+
+** Chapter 2
+
+Yay, he gives psuedocode for a scanner for a calculator.
+That seems like it's worth implementing.
+
+*** Grammar
+The language has the following symbols
+
+| Meaning | Symbol           |        |
+|---------+------------------+--------|
+| assign  | `:=`             |        |
+| plus    | +                |        |
+| minus   | -                |        |
+| times   | *                |        |
+| div     | /                |        |
+| lparen  | (                |        |
+| rparen  | )                |        |
+| id      | letter (letter \ | digit) |
+| number  | digit digit * |digit*(. digit|digit) digit* |        |
+
+Hmmm, parser descriptions don't work well with org-tables.Sadface
+
+
+*** Code
+#+BEGIN_SRC python
+  import string as s
+  is_number = make_comparator(s.digits)
+  is_letter= make_comparator(s.ascii_letters)
+  mult_ops = ['*', '/']
+  add_ops = ['+', '-' ]
+  brackets = ['(', ')']
+  is_add_op=make_comparator(add_ops)
+  is_mult_op=make_comparator(mult_ops)
+  is_bracket=make_comparator(brackets)
+  is_whitespace = make_comparator(s.whitespace)
+  assigns = [':', '=']
+  is_equal = make_comparator(assigns[1])
+  is_colon = make_comparator(':')
+  is_dot = make_comparator('.')
+  def read_file(file):
+      i = 0
+      with open(file) as fileobj:
+          for l, line in enumerate(fileobj):
+              for c,ch in enumerate(line):
+                  i += 1
+                  print( "line is {l}, character is {c} and value is {v}".format (l=l, c=c, v=ch))
+                  # print("iteration is at {i}".format (i=i))
+
+#+END_SRC
+
+So, I kinda deserve what happened there. I stole some code from StackOverflow, and it used the term word for the first iteration.
+This was super confusing, as the file object parses by line (presumably "\n", though one could change that). The code fragment above shows the line, character and the value (there are many newlines/whitespace).
+
+#+BEGIN_SRC python :session
+  import string as s
+  is_number = make_comparator(s.digits)
+  is_letter= make_comparator(s.ascii_letters)
+  mult_ops = ['*', '/']
+  add_ops = ['+', '-' ]
+  brackets = ['(', ')']
+  is_add_op=make_comparator(add_ops)
+  is_mult_op=make_comparator(mult_ops)
+  is_bracket=make_comparator(brackets)
+  is_whitespace = make_comparator(s.whitespace)
+  assigns = [':', '=']
+  is_equal = make_comparator("=")
+  is_colon = make_comparator(':')
+  is_dot = make_comparator('.')
+#+END_SRC
+
+Above I create a bunch of comparison functions to make the string matching in the core scanner easier. It also allowed me to start using higher-order functions in Python (Pro-tip: its really easy).
+
+#+BEGIN_SRC python :session
+  def check_char(char, lookahead):
+      if is_whitespace(ch):
+          next
+      if is_bracket(ch):
+          print(ch)
+      if is_colon(ch):
+          if is_equal(lookahead):
+              #figure out how to handle assignment statements
+              pass
+      if is_dot(ch):
+          #need to handle the peeking here
+          if is_digit(lookahead):
+              # buff = []
+              # while(is_digit(lookahead)):
+              #     lookahead = word[ch+1]
+              pass
+      if is_digit(ch):
+          buff = []
+          # while(is_digit(ch)):
+          #     buff.append(ch)
+          #     num = int(''.join(buff))
+          pass
+      else:
+          print ch
+#+END_SRC
+
+See, it feels like I should be able to just deal with the whole string one char at a time, but some of the grammar requires us to parse the next few characters (i.e. assign, comments, equality (which I don't think the spec requires)). So the simple approach won't work, we'll need access to the higher level "word" (i.e. numbers greater than 10, all string identifiers, assignment and comment).
+
+So I can use lookahead for the scanner, and indeed I probably need to. I could also implement it as while not whitespace, collect characters. I'll need to handle erroring out though, which may be tricky
+
+**** Approaches to lookahead
+- ignore characters, parse the "words" defined by python and file read (spaces, tabs, newlines)
+
+#+BEGIN_SRC python :session
+
+#+END_SRC
+
+I could probably handle alnums separately as they are likely to be the longest strings needed to be processed as a unit.
+Then the comments are likely to be annoying.
+
+#+BEGIN_SRC c
+  //this is a comment, to be annoying
+  int main() {
+      int i = getint(), j = getint();
+      while (i != j) {
+        if (i > j) i = i - j;
+        else j = j - i;
+      }
+      putint(i);
+    }
+#+END_SRC
+
+Does my current program parse this correctly?
+#+BEGIN_SRC python :session
+  read_file("gcd.c")
+#+END_SRC
+
+#+RESULTS:
+:       if (i > j) i = i - j;
+
+It totally does (because I'm not doing individual character matching or trying to remove the comments). So all good until i decide to actually do stuff with it then.
+
+
+#+BEGIN_SRC python :session
+with open("gcd.c") as gcd:
+    for line in gcd:
+        for word in line:
+            if not is_whitespace(word):
+                print(word)
+#+END_SRC
+
+#+RESULTS:
+| 2+2 |
+
+*** Exercises
+Write a regex to match a string in C
+#+BEGIN_SRC sh
+egrep "\"[a-z ]+\"" test.txt
+#+END_SRC
+
+Comments in Pascal parentheses
+
+#+BEGIN_SRC sh
+egrep "^(\*.*\*)" test.txt
+#+END_SRC
+
+Actually, accounting for Emacs, they actually look like this.
+This is because Emacs matches parentheses as parentheses rather than as grouping operators.
+#+BEGIN_SRC sh
+egrep "^\(\*.*\*\)" test.txt
+#+END_SRC
+
+Comments in Pascal both
+
+#+BEGIN_SRC sh
+egrep "^[({].*[)}]" test.txt
+#+END_SRC
+
+Numeric constants in C
+- Octal begins with 0 with digits 0-7
+- hexadecimal begins with 0x or 0X and has 0-9, A-F as elements
+
+Match octal numbers
+#+BEGIN_SRC sh
+egrep "^[0]+[0-7]+" nums.txt
+#+END_SRC
+
+Match hexadecimal numbers
+
+#+BEGIN_SRC sh
+egrep "^0[xX][0-9]+" nums.txt
+#+END_SRC
+
+** Chapter 3
+
+*** Closures
+
+In Scheme.
+
+#+BEGIN_SRC scheme
+  (define plus-x (lambda (x)
+                   (lambda (y) (+ x y))))
+#+END_SRC
+
+Java uses objects to achieve a similar effect.
+
+#+BEGIN_SRC java
+  interface IntFunc {
+      public int call(int t);
+  }
+  class PlusX implements IntFunc {
+      final int x;
+      PlusX(int n) { x = n;}
+      public int call(int i) {return i + x;}
+  }
+  IntFunc f = new PlusX(2);
+  System.out.println(f.call(3));
+#+END_SRC
+
+Java takes a little more code :)
+
+C++ is a little better.
+
+#+BEGIN_SRC C++
+  class int_func {
+  public:
+    virtual int operator() (int i) = 0;
+
+  };
+  class plus_x : public int_func {
+    const int x;
+  public:
+    plus_x(int n) : x(n) {}
+    virtual int operator()(int i) { return i + x;}
+  };
+  plus_x f(2);
+  cout << f(3) << "\n";
+#+END_SRC
+
+
+**** Exercises
+
+These are really good, you should do them.
