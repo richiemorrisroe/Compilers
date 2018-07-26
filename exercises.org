@@ -1,27 +1,27 @@
 * Construct some context free grammars.
 ** Postfix Arithmatic.
 
-Lets start with a few expressions. 
-2+3*5, in infix becomes 23+5*, 
+Lets start with a few expressions.
+2+3*5, in infix becomes 23+5*,
 9+4-10
 
-Expr -> 
-list | digit 
+Expr ->
+list | digit
 plus | digit digit +
 minus | digit digit -
 digit | 0..9
 ** Left associated lists in commas
 So, something like (2, 3, 5) or (a, b, c)
-Expr -> 
+Expr ->
 start | (
 end | )
 list | start elem+ end
-list | (elem) 
+list | (elem)
 list | (elem, list)
 elem | 0..9,
 elem | a-z+,
 ** Right associated lists in commas
-I have no idea how to approach this, probably need to re-read the section. 
+I have no idea how to approach this, probably need to re-read the section.
 ** Arithmetic expressions
 Four binary operators +-*/
 factor -> digit | (expr)
@@ -36,7 +36,7 @@ list -> list + digit
 list -> list - digit
 list -> digit
 digit -> 0|1|2..|9
-** COMMENT Convert integers to roman numerals
+**  Convert integers to roman numerals
 
 Only going to cover up to fifty right now, so I only need a few symbols. I need I, V, X, L
 
@@ -61,7 +61,7 @@ Only going to cover up to fifty right now, so I only need a few symbols. I need 
       print(roman)
 #+END_SRC
 Haven't handled the recursion properly here. The approach seems reasonable though
-Update. It now works, but it's wrong. 
+Update. It now works, but it's wrong.
 
 #+BEGIN_SRC java :tangle output.java
   void stmt() {
@@ -118,7 +118,7 @@ Update. It now works, but it's wrong.
   }
 #+END_SRC
 
-And now for the actual Java program. 
+And now for the actual Java program.
 
 #+BEGIN_SRC java :tangle Postfix.java :classname Postfix
   import java.io.*;
@@ -160,10 +160,10 @@ And now for the actual Java program.
           Parser parse = new Parser();
               parse.expr();
           System.out.write('\n');
-              
+
       }
   }
-      
+
 #+END_SRC
 
 #+BEGIN_SRC java :tangle Tag.java :classname Tag
@@ -231,7 +231,7 @@ And now for the actual Java program.
                     else if(peek == '\n') line = line + 1;
                     else break;
 
-                        
+
         }
         if (Character.isDigit (peek)) {
             int v = 0;

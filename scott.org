@@ -61,9 +61,9 @@ read_file("gcd.c")
 
 #+RESULTS:
 
-Weirdly enough, I can't get Python to write to the org buffer. That's unfortunate. However, when I use the code above, I end up with far too many newlines. I'd actually need to deal with each character as I go to actually lex the file. 
+Weirdly enough, I can't get Python to write to the org buffer. That's unfortunate. However, when I use the code above, I end up with far too many newlines. I'd actually need to deal with each character as I go to actually lex the file.
 
-I'll keep improving it as I go along. 
+I'll keep improving it as I go along.
 
 #+BEGIN_SRC python :session
   x = "teststr123"
@@ -95,12 +95,12 @@ I'll keep improving it as I go along.
   is_letter=make_comparator(s.ascii_letters)
 #+END_SRC
 
-So that's nice. I messed around with parsing, found the string module (which is awesome), and then used its constants to save me some problems. Additionally, I wrote a function that can be used to make comparators which I can use for lexing as I move along this book. 
+So that's nice. I messed around with parsing, found the string module (which is awesome), and then used its constants to save me some problems. Additionally, I wrote a function that can be used to make comparators which I can use for lexing as I move along this book.
 
 ** Chapter 2
 
 Yay, he gives psuedocode for a scanner for a calculator.
-That seems like it's worth implementing. 
+That seems like it's worth implementing.
 
 *** Grammar
 The language has the following symbols
@@ -148,7 +148,7 @@ Hmmm, parser descriptions don't work well with org-tables.Sadface
 #+END_SRC
 
 So, I kinda deserve what happened there. I stole some code from StackOverflow, and it used the term word for the first iteration.
-This was super confusing, as the file object parses by line (presumably "\n", though one could change that). The code fragment above shows the line, character and the value (there are many newlines/whitespace). 
+This was super confusing, as the file object parses by line (presumably "\n", though one could change that). The code fragment above shows the line, character and the value (there are many newlines/whitespace).
 
 #+BEGIN_SRC python :session
   import string as s
@@ -167,7 +167,7 @@ This was super confusing, as the file object parses by line (presumably "\n", th
   is_dot = make_comparator('.')
 #+END_SRC
 
-Above I create a bunch of comparison functions to make the string matching in the core scanner easier. It also allowed me to start using higher-order functions in Python (Pro-tip: its really easy). 
+Above I create a bunch of comparison functions to make the string matching in the core scanner easier. It also allowed me to start using higher-order functions in Python (Pro-tip: its really easy).
 
 #+BEGIN_SRC python :session
   def check_char(char, lookahead):
@@ -196,7 +196,7 @@ Above I create a bunch of comparison functions to make the string matching in th
           print ch
 #+END_SRC
 
-See, it feels like I should be able to just deal with the whole string one char at a time, but some of the grammar requires us to parse the next few characters (i.e. assign, comments, equality (which I don't think the spec requires)). So the simple approach won't work, we'll need access to the higher level "word" (i.e. numbers greater than 10, all string identifiers, assignment and comment). 
+See, it feels like I should be able to just deal with the whole string one char at a time, but some of the grammar requires us to parse the next few characters (i.e. assign, comments, equality (which I don't think the spec requires)). So the simple approach won't work, we'll need access to the higher level "word" (i.e. numbers greater than 10, all string identifiers, assignment and comment).
 
 So I can use lookahead for the scanner, and indeed I probably need to. I could also implement it as while not whitespace, collect characters. I'll need to handle erroring out though, which may be tricky
 
@@ -207,8 +207,8 @@ So I can use lookahead for the scanner, and indeed I probably need to. I could a
 
 #+END_SRC
 
-I could probably handle alnums separately as they are likely to be the longest strings needed to be processed as a unit. 
-Then the comments are likely to be annoying. 
+I could probably handle alnums separately as they are likely to be the longest strings needed to be processed as a unit.
+Then the comments are likely to be annoying.
 
 #+BEGIN_SRC c
   //this is a comment, to be annoying
@@ -230,7 +230,7 @@ Does my current program parse this correctly?
 #+RESULTS:
 :       if (i > j) i = i - j;
 
-It totally does (because I'm not doing individual character matching or trying to remove the comments). So all good until i decide to actually do stuff with it then. 
+It totally does (because I'm not doing individual character matching or trying to remove the comments). So all good until i decide to actually do stuff with it then.
 
 
 #+BEGIN_SRC python :session
@@ -241,10 +241,13 @@ with open("gcd.c") as gcd:
                 print(word)
 #+END_SRC
 
+#+RESULTS:
+| 2+2 |
+
 *** Exercises
 Write a regex to match a string in C
 #+BEGIN_SRC sh
-egrep "\"[a-z ]+\"" test.txt 
+egrep "\"[a-z ]+\"" test.txt
 #+END_SRC
 
 Comments in Pascal parentheses
@@ -253,8 +256,8 @@ Comments in Pascal parentheses
 egrep "^(\*.*\*)" test.txt
 #+END_SRC
 
-Actually, accounting for Emacs, they actually look like this. 
-This is because Emacs matches parentheses as parentheses rather than as grouping operators. 
+Actually, accounting for Emacs, they actually look like this.
+This is because Emacs matches parentheses as parentheses rather than as grouping operators.
 #+BEGIN_SRC sh
 egrep "^\(\*.*\*\)" test.txt
 #+END_SRC
@@ -284,7 +287,7 @@ egrep "^0[xX][0-9]+" nums.txt
 
 *** Closures
 
-In Scheme. 
+In Scheme.
 
 #+BEGIN_SRC scheme
   (define plus-x (lambda (x)
@@ -308,7 +311,7 @@ Java uses objects to achieve a similar effect.
 
 Java takes a little more code :)
 
-C++ is a little better. 
+C++ is a little better.
 
 #+BEGIN_SRC C++
   class int_func {
